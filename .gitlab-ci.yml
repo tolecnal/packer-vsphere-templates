@@ -74,7 +74,7 @@ build-debian-12:
   image: $DOCKER_IMAGE
   script:
     - echo "Building Debian 12 template..."
-    - packer build -var-file="configs/debian-12/variables.pkrvars.hcl" -only="debian-12" .
+    - packer build -var-file="configs/debian-12/variables.pkrvars.hcl" -only="debian-12" variables.pkr.hcl locals.pkr.hcl builds/debian-12.pkr.hcl
     - echo "Publishing Debian 12 template..."
     - |
       # Set govc environment variables
@@ -110,7 +110,7 @@ build-debian-13:
   image: $DOCKER_IMAGE
   script:
     - echo "Building Debian 13 template..."
-    - packer build -var-file="configs/debian-13/variables.pkrvars.hcl" -only="debian-13" .
+    - packer build -var-file="configs/debian-13/variables.pkrvars.hcl" -only="debian-13" variables.pkr.hcl locals.pkr.hcl builds/debian-13.pkr.hcl
     - echo "Publishing Debian 13 template..."
     - |
       # Set govc environment variables
@@ -146,7 +146,7 @@ build-ubuntu-22-04:
   image: $DOCKER_IMAGE
   script:
     - echo "Building Ubuntu 22.04 template..."
-    - packer build -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" -only="ubuntu-22-04" .
+    - packer build -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" -only="ubuntu-22-04" variables.pkr.hcl locals.pkr.hcl builds/ubuntu-22.04.pkr.hcl
     - echo "Publishing Ubuntu 22.04 template..."
     - |
       # Set govc environment variables
@@ -182,7 +182,7 @@ build-ubuntu-24-04:
   image: $DOCKER_IMAGE
   script:
     - echo "Building Ubuntu 24.04 template..."
-    - packer build -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" -only="ubuntu-24-04" .
+    - packer build -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" -only="ubuntu-24-04" variables.pkr.hcl locals.pkr.hcl builds/ubuntu-24.04.pkr.hcl
     - echo "Publishing Ubuntu 24.04 template..."
     - |
       # Set govc environment variables
@@ -230,7 +230,7 @@ build-all-templates:
         echo "Building $template..."
         # Convert template name to build name (ubuntu uses dashes in build names)
         build_name=$(echo "$template" | sed 's/ubuntu-/ubuntu-/' | sed 's/ubuntu-22.04/ubuntu-22-04/' | sed 's/ubuntu-24.04/ubuntu-24-04/')
-        packer build -var-file="configs/$template/variables.pkrvars.hcl" -only="$build_name" . || {
+        packer build -var-file="configs/$template/variables.pkrvars.hcl" -only="$build_name" variables.pkr.hcl locals.pkr.hcl builds/$template.pkr.hcl || {
           echo "Failed to build $template"
           exit 1
         }
