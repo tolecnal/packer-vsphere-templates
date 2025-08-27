@@ -76,6 +76,12 @@ build-debian-12:
     - echo "Building Debian 12 template..."
     - echo "Checking files before build:"
     - ls -la *.pkr.hcl
+    - echo "Build template files:"
+    - ls -la builds/*.pkr.hcl
+    - echo "Copy build templates to root directory:"
+    - cp builds/*.pkr.hcl .
+    - echo "All Packer files:"
+    - ls -la *.pkr.hcl
     - echo "Initialize Packer configuration:"
     - packer init .
     - echo "Building with all .pkr.hcl files:"
