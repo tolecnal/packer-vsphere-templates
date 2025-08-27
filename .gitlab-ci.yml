@@ -23,9 +23,12 @@ build-packer-image:
     - docker build --build-arg PACKER_VERSION=$PACKER_VERSION -t $DOCKER_IMAGE .
     - docker push $DOCKER_IMAGE
   only:
-    - merge_requests
-    - main
-    - tags
+    changes:
+      - Dockerfile
+    refs:
+      - merge_requests
+      - main
+      - tags
 
 # Validation stage (runs on inet runner with Docker image)
 packer-validate:
@@ -35,12 +38,10 @@ packer-validate:
   image: $DOCKER_IMAGE
   script:
     - echo "Validating Packer templates..."
-    - packer validate builds/debian-12.pkr.hcl
-    - packer validate builds/debian-13.pkr.hcl
-    - packer validate builds/ubuntu-22.04.pkr.hcl
-    - packer validate builds/ubuntu-24.04.pkr.hcl
-  needs:
-    - build-packer-image
+    - packer validate -var-file="configs/debian-12/variables.pkrvars.hcl" .
+    - packer validate -var-file="configs/debian-13/variables.pkrvars.hcl" .
+    - packer validate -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" .
+    - packer validate -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" .
   only:
     - merge_requests
     - main
@@ -74,8 +75,6 @@ build-debian-12:
     reports:
       junit: packer-manifest.json
     expire_in: 1 week
-  needs:
-    - build-packer-image
   only:
     variables:
       - $BUILD_DEBIAN_12 == "true"
@@ -112,8 +111,6 @@ build-debian-13:
     reports:
       junit: packer-manifest.json
     expire_in: 1 week
-  needs:
-    - build-packer-image
   only:
     variables:
       - $BUILD_DEBIAN_13 == "true"
@@ -150,8 +147,6 @@ build-ubuntu-22-04:
     reports:
       junit: packer-manifest.json
     expire_in: 1 week
-  needs:
-    - build-packer-image
   only:
     variables:
       - $BUILD_UBUNTU_22_04 == "true"
@@ -188,8 +183,6 @@ build-ubuntu-24-04:
     reports:
       junit: packer-manifest.json
     expire_in: 1 week
-  needs:
-    - build-packer-image
   only:
     variables:
       - $BUILD_UBUNTU_24_04 == "true"
@@ -233,8 +226,6 @@ build-all-templates:
     reports:
       junit: packer-manifest.json
     expire_in: 1 week
-  needs:
-    - build-packer-image
   when: manual
   timeout: 4h
 
@@ -264,8 +255,6 @@ cleanup-old-templates:
       # done
       
       echo "Cleanup logic would remove old templates here"
-  needs:
-    - build-packer-image
   when: manual
   only:
     - main
