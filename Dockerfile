@@ -28,8 +28,11 @@ RUN wget -q https://github.com/vmware/govmomi/releases/download/v${GOVC_VERSION}
     rm govc_Linux_x86_64.tar.gz && \
     chmod +x /usr/local/bin/govc
 
+# Install Packer vsphere plugin
+RUN packer plugins install github.com/hashicorp/vsphere
+
 # Verify installations
-RUN packer version && govc version
+RUN packer version && govc version && packer plugins installed
 
 # Set working directory
 WORKDIR /workspace
