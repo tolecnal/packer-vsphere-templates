@@ -12,7 +12,7 @@ RUN apk add --no-cache \
 
 # Set versions
 ARG PACKER_VERSION=1.14.1
-ARG GOVC_VERSION=0.34.2
+ARG GOVC_VERSION=0.52.0
 
 # Download and install Packer
 RUN wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip && \
