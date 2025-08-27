@@ -65,7 +65,7 @@ locals {
   debian_12 = {
     guest_os_type    = "debian12_64Guest"
     iso_url          = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.7.0-amd64-netinst.iso"
-    iso_checksum     = "sha256:8d4d5b91976e5d2b9a35e97b99a5eb1f5f3b4306e6d38d5f8c2e0e8f1d5e2f3a4"
+    iso_checksum     = "sha256:911c556e90d34b5bb76fbf5509e14b28d1c3fcc79c91f5a43b52fa8e5b0b6542"
     vm_name          = "debian-12-template-${local.vm_name_timestamp}"
     boot_command = [
       "<esc><wait>",
