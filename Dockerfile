@@ -10,8 +10,9 @@ RUN apk add --no-cache \
     openssh-client \
     git
 
-# Set Packer version
+# Set versions
 ARG PACKER_VERSION=1.14.1
+ARG GOVC_VERSION=0.34.2
 
 # Download and install Packer
 RUN wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip && \
@@ -20,8 +21,15 @@ RUN wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PAC
     rm packer_${PACKER_VERSION}_linux_amd64.zip && \
     chmod +x /usr/local/bin/packer
 
-# Verify Packer installation
-RUN packer version
+# Download and install govc
+RUN wget -q https://github.com/vmware/govmomi/releases/download/v${GOVC_VERSION}/govc_Linux_x86_64.tar.gz && \
+    tar -xzf govc_Linux_x86_64.tar.gz && \
+    mv govc /usr/local/bin/ && \
+    rm govc_Linux_x86_64.tar.gz && \
+    chmod +x /usr/local/bin/govc
+
+# Verify installations
+RUN packer version && govc version
 
 # Set working directory
 WORKDIR /workspace

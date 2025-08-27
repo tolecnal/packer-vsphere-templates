@@ -54,6 +54,22 @@ build-debian-12:
   script:
     - echo "Building Debian 12 template..."
     - packer build -var-file="configs/debian-12/variables.pkrvars.hcl" builds/debian-12.pkr.hcl
+    - echo "Publishing Debian 12 template..."
+    - |
+      # Set govc environment variables
+      export GOVC_URL="$VCENTER_URL"
+      export GOVC_USERNAME="$VCENTER_USERNAME" 
+      export GOVC_PASSWORD="$VCENTER_PASSWORD"
+      export GOVC_INSECURE=1
+      
+      # Convert VM to template (adjust VM name pattern as needed)
+      VM_NAME=$(govc find . -type m -name "*debian-12*" | head -1)
+      if [ -n "$VM_NAME" ]; then
+        echo "Converting $VM_NAME to template..."
+        govc vm.markastemplate "$VM_NAME"
+      else
+        echo "No Debian 12 VM found to convert"
+      fi
   artifacts:
     reports:
       junit: packer-manifest.json
@@ -76,6 +92,22 @@ build-debian-13:
   script:
     - echo "Building Debian 13 template..."
     - packer build -var-file="configs/debian-13/variables.pkrvars.hcl" builds/debian-13.pkr.hcl
+    - echo "Publishing Debian 13 template..."
+    - |
+      # Set govc environment variables
+      export GOVC_URL="$VCENTER_URL"
+      export GOVC_USERNAME="$VCENTER_USERNAME" 
+      export GOVC_PASSWORD="$VCENTER_PASSWORD"
+      export GOVC_INSECURE=1
+      
+      # Convert VM to template (adjust VM name pattern as needed)
+      VM_NAME=$(govc find . -type m -name "*debian-13*" | head -1)
+      if [ -n "$VM_NAME" ]; then
+        echo "Converting $VM_NAME to template..."
+        govc vm.markastemplate "$VM_NAME"
+      else
+        echo "No Debian 13 VM found to convert"
+      fi
   artifacts:
     reports:
       junit: packer-manifest.json
@@ -98,6 +130,22 @@ build-ubuntu-22-04:
   script:
     - echo "Building Ubuntu 22.04 template..."
     - packer build -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" builds/ubuntu-22.04.pkr.hcl
+    - echo "Publishing Ubuntu 22.04 template..."
+    - |
+      # Set govc environment variables
+      export GOVC_URL="$VCENTER_URL"
+      export GOVC_USERNAME="$VCENTER_USERNAME" 
+      export GOVC_PASSWORD="$VCENTER_PASSWORD"
+      export GOVC_INSECURE=1
+      
+      # Convert VM to template (adjust VM name pattern as needed)
+      VM_NAME=$(govc find . -type m -name "*ubuntu-22*" | head -1)
+      if [ -n "$VM_NAME" ]; then
+        echo "Converting $VM_NAME to template..."
+        govc vm.markastemplate "$VM_NAME"
+      else
+        echo "No Ubuntu 22.04 VM found to convert"
+      fi
   artifacts:
     reports:
       junit: packer-manifest.json
@@ -120,6 +168,22 @@ build-ubuntu-24-04:
   script:
     - echo "Building Ubuntu 24.04 template..."
     - packer build -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" builds/ubuntu-24.04.pkr.hcl
+    - echo "Publishing Ubuntu 24.04 template..."
+    - |
+      # Set govc environment variables
+      export GOVC_URL="$VCENTER_URL"
+      export GOVC_USERNAME="$VCENTER_USERNAME" 
+      export GOVC_PASSWORD="$VCENTER_PASSWORD"
+      export GOVC_INSECURE=1
+      
+      # Convert VM to template (adjust VM name pattern as needed)
+      VM_NAME=$(govc find . -type m -name "*ubuntu-24*" | head -1)
+      if [ -n "$VM_NAME" ]; then
+        echo "Converting $VM_NAME to template..."
+        govc vm.markastemplate "$VM_NAME"
+      else
+        echo "No Ubuntu 24.04 VM found to convert"
+      fi
   artifacts:
     reports:
       junit: packer-manifest.json
@@ -143,12 +207,27 @@ build-all-templates:
   script:
     - echo "Building all templates..."
     - |
+      # Set govc environment variables
+      export GOVC_URL="$VCENTER_URL"
+      export GOVC_USERNAME="$VCENTER_USERNAME" 
+      export GOVC_PASSWORD="$VCENTER_PASSWORD"
+      export GOVC_INSECURE=1
+      
       for template in debian-12 debian-13 ubuntu-22.04 ubuntu-24.04; do
         echo "Building $template..."
         packer build -var-file="configs/$template/variables.pkrvars.hcl" "builds/$template.pkr.hcl" || {
           echo "Failed to build $template"
           exit 1
         }
+        
+        echo "Publishing $template template..."
+        VM_NAME=$(govc find . -type m -name "*$template*" | head -1)
+        if [ -n "$VM_NAME" ]; then
+          echo "Converting $VM_NAME to template..."
+          govc vm.markastemplate "$VM_NAME"
+        else
+          echo "No $template VM found to convert"
+        fi
       done
   artifacts:
     reports:
@@ -166,8 +245,25 @@ cleanup-old-templates:
     - esxi
   image: $DOCKER_IMAGE
   script:
-    - echo "Cleanup can be implemented here to remove old templates from vCenter"
-    - echo "This would typically involve using govc or PowerCLI to remove old templates"
+    - echo "Cleaning up old templates from vCenter..."
+    - |
+      # Set govc environment variables (these should be set as CI/CD variables)
+      export GOVC_URL="$VCENTER_URL"
+      export GOVC_USERNAME="$VCENTER_USERNAME"
+      export GOVC_PASSWORD="$VCENTER_PASSWORD"
+      export GOVC_INSECURE=1
+      
+      # List and remove old templates (example logic)
+      echo "Finding templates older than 30 days..."
+      
+      # Example cleanup commands using govc
+      # govc find . -type m -name "packer-*" | while read template; do
+      #   created=$(govc object.collect -s "$template" config.createDate)
+      #   # Add date comparison logic here
+      #   echo "Would remove old template: $template"
+      # done
+      
+      echo "Cleanup logic would remove old templates here"
   needs:
     - build-packer-image
   when: manual
