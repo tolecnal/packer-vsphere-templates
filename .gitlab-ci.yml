@@ -74,7 +74,15 @@ build-debian-12:
   image: $DOCKER_IMAGE
   script:
     - echo "Building Debian 12 template..."
-    - packer build -var-file="configs/debian-12/variables.pkrvars.hcl" -only="debian-12" variables.pkr.hcl locals.pkr.hcl builds/debian-12.pkr.hcl
+    - echo "Checking files before build:"
+    - ls -la *.pkr.hcl
+    - echo "Initialize Packer configuration:"
+    - packer init .
+    - echo "Building with all .pkr.hcl files:"
+    - echo "Available builds:"
+    - packer inspect .
+    - echo "Starting build:"
+    - packer build -var-file="configs/debian-12/variables.pkrvars.hcl" -only="debian-12" .
     - echo "Publishing Debian 12 template..."
     - |
       # Set govc environment variables
