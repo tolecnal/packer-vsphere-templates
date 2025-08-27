@@ -1,0 +1,138 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+    variant: ''
+  network:
+    network:
+      version: 2
+      ethernets:
+        ens160:
+          dhcp4: true
+  storage:
+    layout:
+      name: lvm
+    config:
+      - type: disk
+        id: disk-sda
+        path: /dev/sda
+        wipe: superblock-recursive
+        preserve: false
+        grub_device: false
+      - type: partition
+        id: partition-0
+        device: disk-sda
+        size: 1048576
+        wipe: superblock
+        flag: bios_grub
+        number: 1
+        preserve: false
+        grub_device: false
+      - type: partition
+        id: partition-1
+        device: disk-sda
+        size: 2147483648
+        wipe: superblock
+        flag: ''
+        number: 2
+        preserve: false
+        grub_device: false
+      - type: format
+        id: format-0
+        fstype: ext4
+        volume: partition-1
+        preserve: false
+      - type: partition
+        id: partition-2
+        device: disk-sda
+        size: -1
+        wipe: superblock
+        flag: ''
+        number: 3
+        preserve: false
+        grub_device: false
+      - type: lvm_volgroup
+        id: lvm_volgroup-0
+        name: system
+        devices:
+          - partition-2
+        preserve: false
+      - type: lvm_partition
+        id: lvm_partition-0
+        name: root
+        volgroup: lvm_volgroup-0
+        size: 20971520000
+        preserve: false
+      - type: lvm_partition
+        id: lvm_partition-1
+        name: swap
+        volgroup: lvm_volgroup-0
+        size: 4294967296
+        preserve: false
+      - type: lvm_partition
+        id: lvm_partition-2
+        name: home
+        volgroup: lvm_volgroup-0
+        size: -1
+        preserve: false
+      - type: format
+        id: format-1
+        fstype: ext4
+        volume: lvm_partition-0
+        preserve: false
+      - type: format
+        id: format-2
+        fstype: swap
+        volume: lvm_partition-1
+        preserve: false
+      - type: format
+        id: format-3
+        fstype: ext4
+        volume: lvm_partition-2
+        preserve: false
+      - type: mount
+        id: mount-0
+        device: format-1
+        path: /
+        preserve: false
+      - type: mount
+        id: mount-1
+        device: format-0
+        path: /boot
+        preserve: false
+      - type: mount
+        id: mount-2
+        device: format-2
+        path: none
+        preserve: false
+      - type: mount
+        id: mount-3
+        device: format-3
+        path: /home
+        preserve: false
+  identity:
+    hostname: ubuntu-24-04
+    password: '$6$rounds=4096$aQ7lsJBaWyEj9DoO$1KlqgcVxF5AaFH/VqPXKq1u.D/B6uKk2r1/nWqXR3f5h2z7xFqvK6V5OxNk7R6l1A7P6R4P4P4P4P4P4P4P4P4'
+    username: root
+  ssh:
+    install-server: true
+    allow-pw: true
+  packages:
+    - openssh-server
+    - curl
+    - wget
+    - gnupg2
+    - software-properties-common
+    - apt-transport-https
+    - ca-certificates
+    - lsb-release
+    - sudo
+    - lvm2
+  user-data:
+    disable_root: false
+    preserve_hostname: false
+  late-commands:
+    - echo 'root:packer' | chroot /target chpasswd
+    - chroot /target systemctl enable ssh

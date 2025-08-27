@@ -1,0 +1,195 @@
+stages:
+  - build-image
+  - validate
+  - build
+  - cleanup
+
+variables:
+  PACKER_VERSION: "1.14.1"
+  DOCKER_IMAGE: "$CI_REGISTRY_IMAGE:latest"
+  DOCKER_DRIVER: overlay2
+
+# Build Docker image with Packer (runs on inet runner)
+build-packer-image:
+  stage: build-image
+  tags:
+    - inet
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build --build-arg PACKER_VERSION=$PACKER_VERSION -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
+  only:
+    - merge_requests
+    - main
+    - tags
+
+# Validation stage (runs on inet runner with Docker image)
+packer-validate:
+  stage: validate
+  tags:
+    - inet
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Validating Packer templates..."
+    - packer validate builds/debian-12.pkr.hcl
+    - packer validate builds/debian-13.pkr.hcl
+    - packer validate builds/ubuntu-22.04.pkr.hcl
+    - packer validate builds/ubuntu-24.04.pkr.hcl
+  needs:
+    - build-packer-image
+  only:
+    - merge_requests
+    - main
+
+# Build templates (runs on esxi runner with vCenter access)
+build-debian-12:
+  stage: build
+  tags:
+    - esxi
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Building Debian 12 template..."
+    - packer build -var-file="configs/debian-12/variables.pkrvars.hcl" builds/debian-12.pkr.hcl
+  artifacts:
+    reports:
+      junit: packer-manifest.json
+    expire_in: 1 week
+  needs:
+    - build-packer-image
+  only:
+    variables:
+      - $BUILD_DEBIAN_12 == "true"
+    refs:
+      - main
+      - tags
+  timeout: 2h
+
+build-debian-13:
+  stage: build
+  tags:
+    - esxi
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Building Debian 13 template..."
+    - packer build -var-file="configs/debian-13/variables.pkrvars.hcl" builds/debian-13.pkr.hcl
+  artifacts:
+    reports:
+      junit: packer-manifest.json
+    expire_in: 1 week
+  needs:
+    - build-packer-image
+  only:
+    variables:
+      - $BUILD_DEBIAN_13 == "true"
+    refs:
+      - main
+      - tags
+  timeout: 2h
+
+build-ubuntu-22-04:
+  stage: build
+  tags:
+    - esxi
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Building Ubuntu 22.04 template..."
+    - packer build -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" builds/ubuntu-22.04.pkr.hcl
+  artifacts:
+    reports:
+      junit: packer-manifest.json
+    expire_in: 1 week
+  needs:
+    - build-packer-image
+  only:
+    variables:
+      - $BUILD_UBUNTU_22_04 == "true"
+    refs:
+      - main
+      - tags
+  timeout: 2h
+
+build-ubuntu-24-04:
+  stage: build
+  tags:
+    - esxi
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Building Ubuntu 24.04 template..."
+    - packer build -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" builds/ubuntu-24.04.pkr.hcl
+  artifacts:
+    reports:
+      junit: packer-manifest.json
+    expire_in: 1 week
+  needs:
+    - build-packer-image
+  only:
+    variables:
+      - $BUILD_UBUNTU_24_04 == "true"
+    refs:
+      - main
+      - tags
+  timeout: 2h
+
+# Build all templates (manual trigger)
+build-all-templates:
+  stage: build
+  tags:
+    - esxi
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Building all templates..."
+    - |
+      for template in debian-12 debian-13 ubuntu-22.04 ubuntu-24.04; do
+        echo "Building $template..."
+        packer build -var-file="configs/$template/variables.pkrvars.hcl" "builds/$template.pkr.hcl" || {
+          echo "Failed to build $template"
+          exit 1
+        }
+      done
+  artifacts:
+    reports:
+      junit: packer-manifest.json
+    expire_in: 1 week
+  needs:
+    - build-packer-image
+  when: manual
+  timeout: 4h
+
+# Cleanup old templates (optional)
+cleanup-old-templates:
+  stage: cleanup
+  tags:
+    - esxi
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Cleanup can be implemented here to remove old templates from vCenter"
+    - echo "This would typically involve using govc or PowerCLI to remove old templates"
+  needs:
+    - build-packer-image
+  when: manual
+  only:
+    - main
+
+# Security scanning (optional)
+security-scan:
+  stage: validate
+  tags:
+    - inet
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Running security scans on Packer templates"
+    - |
+      # Example: scan for sensitive data in templates
+      if grep -r "password\|secret\|key" configs/ --exclude-dir=.git; then
+        echo "Warning: Found potential sensitive data in templates"
+      fi
+  needs:
+    - build-packer-image
+  allow_failure: true
+  only:
+    - merge_requests
+    - main
