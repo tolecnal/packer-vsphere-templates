@@ -39,19 +39,28 @@ packer-validate:
   script:
     - echo "Validating Packer templates..."
     - |
-      # Validate by running builds individually from root directory
-      # This ensures all .pkr.hcl files are loaded together
-      echo "Validating debian-12 build..."
-      packer validate -var-file="configs/debian-12/variables.pkrvars.hcl" -only="debian-12" .
+      # Create isolated validation for each template
+      original_dir=$(pwd)
       
-      echo "Validating debian-13 build..."
-      packer validate -var-file="configs/debian-13/variables.pkrvars.hcl" -only="debian-13" .
-      
-      echo "Validating ubuntu-22-04 build..."
-      packer validate -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" -only="ubuntu-22-04" .
-      
-      echo "Validating ubuntu-24-04 build..."
-      packer validate -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" -only="ubuntu-24-04" .
+      for template in debian-12 debian-13 ubuntu-22.04 ubuntu-24.04; do
+        echo "Validating $template build..."
+        
+        # Create temporary directory for this validation
+        temp_dir="/tmp/validate-$template"
+        mkdir -p "$temp_dir"
+        
+        # Copy required files to temp directory
+        cp variables.pkr.hcl locals.pkr.hcl "$temp_dir/"
+        cp "builds/$template.pkr.hcl" "$temp_dir/"
+        
+        # Run validation in the isolated directory
+        cd "$temp_dir"
+        packer validate -var-file="$original_dir/configs/$template/variables.pkrvars.hcl" .
+        cd "$original_dir"
+        
+        # Cleanup
+        rm -rf "$temp_dir"
+      done
   only:
     - merge_requests
     - main
