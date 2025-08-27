@@ -38,10 +38,10 @@ packer-validate:
   image: $DOCKER_IMAGE
   script:
     - echo "Validating Packer templates..."
-    - packer validate -var-file="configs/debian-12/variables.pkrvars.hcl" .
-    - packer validate -var-file="configs/debian-13/variables.pkrvars.hcl" .
-    - packer validate -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" .
-    - packer validate -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" .
+    - packer validate -var-file="configs/debian-12/variables.pkrvars.hcl" -only="debian-12.*" .
+    - packer validate -var-file="configs/debian-13/variables.pkrvars.hcl" -only="debian-13.*" .
+    - packer validate -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" -only="ubuntu-22-04.*" .
+    - packer validate -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" -only="ubuntu-24-04.*" .
   only:
     - merge_requests
     - main

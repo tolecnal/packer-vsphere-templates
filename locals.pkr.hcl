@@ -19,12 +19,12 @@ locals {
     
     disk_controller_type      = [var.vm_disk_controller_type]
     
-    storage {
+    storage = {
       disk_size             = var.vm_disk_size_gb * 1024
       disk_thin_provisioned = var.vm_disk_thin_provisioned
     }
     
-    network_adapters {
+    network_adapters = {
       network      = var.vcenter_network
       network_card = var.vm_network_card
     }
