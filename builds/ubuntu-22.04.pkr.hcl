@@ -69,6 +69,7 @@ build {
   
   dynamic "provisioner" {
     for_each = local.common_provisioners
+    labels   = [provisioner.value.type]
     content {
       type   = provisioner.value.type
       script = provisioner.value.script
