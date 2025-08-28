@@ -72,6 +72,8 @@ build-debian-12:
   tags:
     - esxi
   image: $DOCKER_IMAGE
+  variables:
+    DOCKER_NETWORK_MODE: host
   script:
     - echo "Building Debian 12 template..."
     - echo "Checking files before build:"
@@ -122,6 +124,8 @@ build-debian-13:
   tags:
     - esxi
   image: $DOCKER_IMAGE
+  variables:
+    DOCKER_NETWORK_MODE: host
   script:
     - echo "Building Debian 13 template..."
     - packer build -var-file="configs/debian-13/variables.pkrvars.hcl" -only="debian-13" variables.pkr.hcl locals.pkr.hcl builds/debian-13.pkr.hcl
@@ -158,6 +162,8 @@ build-ubuntu-22-04:
   tags:
     - esxi
   image: $DOCKER_IMAGE
+  variables:
+    DOCKER_NETWORK_MODE: host
   script:
     - echo "Building Ubuntu 22.04 template..."
     - packer build -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" -only="ubuntu-22-04" variables.pkr.hcl locals.pkr.hcl builds/ubuntu-22.04.pkr.hcl
@@ -194,6 +200,8 @@ build-ubuntu-24-04:
   tags:
     - esxi
   image: $DOCKER_IMAGE
+  variables:
+    DOCKER_NETWORK_MODE: host
   script:
     - echo "Building Ubuntu 24.04 template..."
     - packer build -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" -only="ubuntu-24-04" variables.pkr.hcl locals.pkr.hcl builds/ubuntu-24.04.pkr.hcl
@@ -243,6 +251,8 @@ cleanup-old-templates:
   tags:
     - esxi
   image: $DOCKER_IMAGE
+  variables:
+    DOCKER_NETWORK_MODE: host
   script:
     - echo "Cleaning up old templates from vCenter..."
     - |
