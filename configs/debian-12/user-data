@@ -22,18 +22,7 @@ autoinstall:
         dhcp-identifier: mac
   
   apt:
-    disable_components: []
-    geoip: false
-    preserve_sources_list: false
-    primary:
-      - arches: [amd64]
-        uri: http://deb.debian.org/debian
-    sources: {}
-    sources_list: |
-      # Air-gapped - disable automatic updates
-      # deb http://deb.debian.org/debian bookworm main
-      # deb http://deb.debian.org/debian bookworm-updates main
-      # deb http://deb.debian.org/debian-security bookworm-security main
+    preserve_sources_list: true
     disable_suites: [updates, backports, security]
   
   storage:
