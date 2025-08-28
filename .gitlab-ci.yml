@@ -76,6 +76,9 @@ build-debian-12:
     DOCKER_NETWORK_MODE: host
   script:
     - echo "Building Debian 12 template..."
+    - echo "Detecting host IP address..."
+    - export HOST_IP=$(ip route get 1.1.1.1 | awk '{print $7; exit}')
+    - echo "Host IP detected as: $HOST_IP"
     - echo "Checking files before build:"
     - ls -la *.pkr.hcl
     - echo "Build template files:"
@@ -90,7 +93,7 @@ build-debian-12:
     - echo "Available builds:"
     - packer inspect .
     - echo "Starting build:"
-    - packer build -var-file="configs/debian-12/variables.pkrvars.hcl" -only="debian-12" .
+    - PACKER_HTTP_ADDR="$HOST_IP:0" packer build -var-file="configs/debian-12/variables.pkrvars.hcl" -only="debian-12" .
     - echo "Publishing Debian 12 template..."
     - |
       # Set govc environment variables
@@ -128,7 +131,13 @@ build-debian-13:
     DOCKER_NETWORK_MODE: host
   script:
     - echo "Building Debian 13 template..."
-    - packer build -var-file="configs/debian-13/variables.pkrvars.hcl" -only="debian-13" variables.pkr.hcl locals.pkr.hcl builds/debian-13.pkr.hcl
+    - echo "Detecting host IP address..."
+    - export HOST_IP=$(ip route get 1.1.1.1 | awk '{print $7; exit}')
+    - echo "Host IP detected as: $HOST_IP"
+    - echo "Copy build templates to root directory:"
+    - cp builds/*.pkr.hcl .
+    - packer init .
+    - PACKER_HTTP_ADDR="$HOST_IP:0" packer build -var-file="configs/debian-13/variables.pkrvars.hcl" -only="debian-13" .
     - echo "Publishing Debian 13 template..."
     - |
       # Set govc environment variables
@@ -166,7 +175,13 @@ build-ubuntu-22-04:
     DOCKER_NETWORK_MODE: host
   script:
     - echo "Building Ubuntu 22.04 template..."
-    - packer build -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" -only="ubuntu-22-04" variables.pkr.hcl locals.pkr.hcl builds/ubuntu-22.04.pkr.hcl
+    - echo "Detecting host IP address..."
+    - export HOST_IP=$(ip route get 1.1.1.1 | awk '{print $7; exit}')
+    - echo "Host IP detected as: $HOST_IP"
+    - echo "Copy build templates to root directory:"
+    - cp builds/*.pkr.hcl .
+    - packer init .
+    - PACKER_HTTP_ADDR="$HOST_IP:0" packer build -var-file="configs/ubuntu-22.04/variables.pkrvars.hcl" -only="ubuntu-22-04" .
     - echo "Publishing Ubuntu 22.04 template..."
     - |
       # Set govc environment variables
@@ -204,7 +219,13 @@ build-ubuntu-24-04:
     DOCKER_NETWORK_MODE: host
   script:
     - echo "Building Ubuntu 24.04 template..."
-    - packer build -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" -only="ubuntu-24-04" variables.pkr.hcl locals.pkr.hcl builds/ubuntu-24.04.pkr.hcl
+    - echo "Detecting host IP address..."
+    - export HOST_IP=$(ip route get 1.1.1.1 | awk '{print $7; exit}')
+    - echo "Host IP detected as: $HOST_IP"
+    - echo "Copy build templates to root directory:"
+    - cp builds/*.pkr.hcl .
+    - packer init .
+    - PACKER_HTTP_ADDR="$HOST_IP:0" packer build -var-file="configs/ubuntu-24.04/variables.pkrvars.hcl" -only="ubuntu-24-04" .
     - echo "Publishing Ubuntu 24.04 template..."
     - |
       # Set govc environment variables
