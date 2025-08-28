@@ -68,15 +68,12 @@ locals {
     iso_checksum     = "sha256:911c556e90d34b5bb76fbf5509e14b28d1c3fcc79c91f5a43b52fa8e5b0b6542"
     vm_name          = "debian-12-template-${local.vm_name_timestamp}"
     boot_command = [
-      "<esc><wait>",
-      "linux /install.amd/vmlinuz <wait>",
-      "initrd /install.amd/initrd.gz <wait>",
-      "auto=true <wait>",
-      "url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-12/user-data <wait>",
-      "hostname=debian-12 <wait>",
-      "domain=localdomain <wait>",
-      "interface=auto <wait>",
-      "vga=788 noprompt quiet --<wait>",
+      "c<wait>",
+      "linux /install.amd/vmlinuz auto=true url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-12/user-data hostname=debian-12 domain=localdomain interface=auto vga=788 noprompt quiet ---<wait>",
+      "<enter><wait>",
+      "initrd /install.amd/initrd.gz<wait>",
+      "<enter><wait>",
+      "boot<wait>",
       "<enter><wait>"
     ]
   }
@@ -87,15 +84,12 @@ locals {
     iso_checksum     = "file:https://cdimage.debian.org/debian-cd/daily-builds/daily/arch-latest/amd64/iso-cd/SHA256SUMS"
     vm_name          = "debian-13-template-${local.vm_name_timestamp}"
     boot_command = [
-      "<esc><wait>",
-      "linux /install.amd/vmlinuz <wait>",
-      "initrd /install.amd/initrd.gz <wait>",
-      "auto=true <wait>",
-      "url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-13/user-data <wait>",
-      "hostname=debian-13 <wait>",
-      "domain=localdomain <wait>",
-      "interface=auto <wait>",
-      "vga=788 noprompt quiet --<wait>",
+      "c<wait>",
+      "linux /install.amd/vmlinuz auto=true url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-13/user-data hostname=debian-13 domain=localdomain interface=auto vga=788 noprompt quiet ---<wait>",
+      "<enter><wait>",
+      "initrd /install.amd/initrd.gz<wait>",
+      "<enter><wait>",
+      "boot<wait>",
       "<enter><wait>"
     ]
   }
