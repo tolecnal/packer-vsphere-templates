@@ -69,7 +69,7 @@ locals {
     vm_name          = "debian-12-template-${local.vm_name_timestamp}"
     boot_command = [
       "c<wait>",
-      "linux /install.amd/vmlinuz auto=true url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-12/user-data hostname=debian-12 domain=localdomain interface=auto ---<wait>",
+      "linux /install.amd/vmlinuz auto=true priority=critical preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-12/preseed.cfg hostname=debian-12 domain=localdomain ---<wait>",
       "<enter><wait>",
       "initrd /install.amd/initrd.gz<wait>",
       "<enter><wait>",
@@ -85,7 +85,7 @@ locals {
     vm_name          = "debian-13-template-${local.vm_name_timestamp}"
     boot_command = [
       "c<wait>",
-      "linux /install.amd/vmlinuz auto=true url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-13/user-data hostname=debian-13 domain=localdomain interface=auto ---<wait>",
+      "linux /install.amd/vmlinuz auto=true priority=critical preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-13/preseed.cfg hostname=debian-13 domain=localdomain ---<wait>",
       "<enter><wait>",
       "initrd /install.amd/initrd.gz<wait>",
       "<enter><wait>",
