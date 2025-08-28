@@ -48,8 +48,8 @@ source "vsphere-iso" "debian-12" {
   boot_command = local.debian_12.boot_command
   
   ssh_timeout  = local.common_vm_settings.ssh_timeout
-  ssh_username = local.common_vm_settings.ssh_username
-  ssh_password = "root"
+  ssh_username = "packer"
+  ssh_password = "packer"
   
   shutdown_command = "echo 'packer' | sudo -S shutdown -P now"
   shutdown_timeout = local.common_vm_settings.shutdown_timeout

@@ -2,20 +2,23 @@
 autoinstall:
   version: 1
   
+  refresh-installer:
+    update: false
+  
   locale: en_US.UTF-8
+  
   keyboard:
     layout: us
     variant: ''
   
   network:
-    network:
-      version: 2
-      ethernets:
-        any:
-          match:
-            name: "e*"
-          dhcp4: true
-          dhcp-identifier: mac
+    version: 2
+    ethernets:
+      any:
+        match:
+          name: "e*"
+        dhcp4: true
+        dhcp-identifier: mac
   
   storage:
     layout:
@@ -25,7 +28,7 @@ autoinstall:
   
   identity:
     hostname: debian-13
-    username: root
+    username: packer
     password: "$6$rounds=4096$aQ7lbUNhb$O.hZhFvVyxFWWrNQ0g8wJb7c0xXuiXm2l8VJ2u3KM7LJdYhEpkYE0dVq7aWUhJBLmPFzZQ5WoMn2lQ4vQ1cJk0"  # packer
   
   ssh:
@@ -38,19 +41,17 @@ autoinstall:
     - curl
     - wget
     - gnupg2
-    - software-properties-common
-    - apt-transport-https 
     - ca-certificates
-    - lsb-release
     - sudo
     - vim
+    - open-vm-tools
   
   user-data:
     disable_root: false
-    users: []
   
   late-commands:
     - echo 'root:packer' | chpasswd
+    - usermod -aG sudo packer
     - systemctl enable ssh
     - sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /target/etc/ssh/sshd_config
     - sed -i 's/^#PubkeyAuthentication.*/PubkeyAuthentication yes/' /target/etc/ssh/sshd_config
