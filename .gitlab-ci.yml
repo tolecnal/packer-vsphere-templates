@@ -225,45 +225,17 @@ build-ubuntu-24-04:
       - tags
   timeout: 2h
 
-# Build all templates (manual trigger)
+# Build all templates (manual trigger) - runs individual build jobs in parallel
 build-all-templates:
   stage: build
-  tags:
-    - esxi
-  image: $DOCKER_IMAGE
   script:
-    - echo "Building all templates..."
-    - |
-      # Set govc environment variables
-      export GOVC_URL="$VCENTER_URL"
-      export GOVC_USERNAME="$VCENTER_USERNAME" 
-      export GOVC_PASSWORD="$VCENTER_PASSWORD"
-      export GOVC_INSECURE=1
-      
-      for template in debian-12 debian-13 ubuntu-22.04 ubuntu-24.04; do
-        echo "Building $template..."
-        # Convert template name to build name (ubuntu uses dashes in build names)
-        build_name=$(echo "$template" | sed 's/ubuntu-/ubuntu-/' | sed 's/ubuntu-22.04/ubuntu-22-04/' | sed 's/ubuntu-24.04/ubuntu-24-04/')
-        packer build -var-file="configs/$template/variables.pkrvars.hcl" -only="$build_name" variables.pkr.hcl locals.pkr.hcl builds/$template.pkr.hcl || {
-          echo "Failed to build $template"
-          exit 1
-        }
-        
-        echo "Publishing $template template..."
-        VM_NAME=$(govc find . -type m -name "*$template*" | head -1)
-        if [ -n "$VM_NAME" ]; then
-          echo "Converting $VM_NAME to template..."
-          govc vm.markastemplate "$VM_NAME"
-        else
-          echo "No $template VM found to convert"
-        fi
-      done
-  artifacts:
-    reports:
-      junit: packer-manifest.json
-    expire_in: 1 week
+    - echo "All templates built successfully via parallel jobs"
+  needs:
+    - build-debian-12
+    - build-debian-13
+    - build-ubuntu-22-04
+    - build-ubuntu-24-04
   when: manual
-  timeout: 4h
 
 # Cleanup old templates (optional)
 cleanup-old-templates:

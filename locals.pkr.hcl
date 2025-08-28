@@ -69,19 +69,14 @@ locals {
     vm_name          = "debian-12-template-${local.vm_name_timestamp}"
     boot_command = [
       "<esc><wait>",
-      "install <wait>",
-      "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-12/preseed.cfg <wait>",
-      "debian-installer=en_US.UTF-8 <wait>",
-      "auto <wait>",
-      "locale=en_US.UTF-8 <wait>",
-      "kbd-chooser/method=us <wait>",
-      "keyboard-configuration/xkb-keymap=us <wait>",
-      "netcfg/get_hostname=debian-12 <wait>",
-      "netcfg/get_domain=localdomain <wait>",
-      "fb=false <wait>",
-      "debconf/frontend=noninteractive <wait>",
-      "console-setup/ask_detect=false <wait>",
-      "console-keymaps-at/keymap=us <wait>",
+      "linux /install.amd/vmlinuz <wait>",
+      "initrd /install.amd/initrd.gz <wait>",
+      "auto=true <wait>",
+      "url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-12/user-data <wait>",
+      "hostname=debian-12 <wait>",
+      "domain=localdomain <wait>",
+      "interface=auto <wait>",
+      "vga=788 noprompt quiet --<wait>",
       "<enter><wait>"
     ]
   }
@@ -93,19 +88,14 @@ locals {
     vm_name          = "debian-13-template-${local.vm_name_timestamp}"
     boot_command = [
       "<esc><wait>",
-      "install <wait>",
-      "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-13/preseed.cfg <wait>",
-      "debian-installer=en_US.UTF-8 <wait>",
-      "auto <wait>",
-      "locale=en_US.UTF-8 <wait>",
-      "kbd-chooser/method=us <wait>",
-      "keyboard-configuration/xkb-keymap=us <wait>",
-      "netcfg/get_hostname=debian-13 <wait>",
-      "netcfg/get_domain=localdomain <wait>",
-      "fb=false <wait>",
-      "debconf/frontend=noninteractive <wait>",
-      "console-setup/ask_detect=false <wait>",
-      "console-keymaps-at/keymap=us <wait>",
+      "linux /install.amd/vmlinuz <wait>",
+      "initrd /install.amd/initrd.gz <wait>",
+      "auto=true <wait>",
+      "url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian-13/user-data <wait>",
+      "hostname=debian-13 <wait>",
+      "domain=localdomain <wait>",
+      "interface=auto <wait>",
+      "vga=788 noprompt quiet --<wait>",
       "<enter><wait>"
     ]
   }

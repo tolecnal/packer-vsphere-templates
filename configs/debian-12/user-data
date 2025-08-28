@@ -1,0 +1,56 @@
+#cloud-config
+autoinstall:
+  version: 1
+  
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+    variant: ''
+  
+  network:
+    network:
+      version: 2
+      ethernets:
+        any:
+          match:
+            name: "e*"
+          dhcp4: true
+          dhcp-identifier: mac
+  
+  storage:
+    layout:
+      name: lvm
+    swap:
+      size: 0
+  
+  identity:
+    hostname: debian-12
+    username: root
+    password: "$6$rounds=4096$aQ7lbUNhb$O.hZhFvVyxFWWrNQ0g8wJb7c0xXuiXm2l8VJ2u3KM7LJdYhEpkYE0dVq7aWUhJBLmPFzZQ5WoMn2lQ4vQ1cJk0"  # packer
+  
+  ssh:
+    install-server: true
+    allow-pw: true
+    authorized-keys: []
+  
+  packages:
+    - openssh-server
+    - curl
+    - wget
+    - gnupg2
+    - software-properties-common
+    - apt-transport-https 
+    - ca-certificates
+    - lsb-release
+    - sudo
+    - vim
+  
+  user-data:
+    disable_root: false
+    users: []
+  
+  late-commands:
+    - echo 'root:packer' | chpasswd
+    - systemctl enable ssh
+    - sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /target/etc/ssh/sshd_config
+    - sed -i 's/^#PubkeyAuthentication.*/PubkeyAuthentication yes/' /target/etc/ssh/sshd_config
