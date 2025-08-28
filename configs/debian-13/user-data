@@ -4,6 +4,7 @@ autoinstall:
   
   refresh-installer:
     update: false
+    channel: false
   
   locale: en_US.UTF-8
   
@@ -19,6 +20,21 @@ autoinstall:
           name: "e*"
         dhcp4: true
         dhcp-identifier: mac
+  
+  apt:
+    disable_components: []
+    geoip: false
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64]
+        uri: http://deb.debian.org/debian
+    sources: {}
+    sources_list: |
+      # Air-gapped - disable automatic updates
+      # deb http://deb.debian.org/debian trixie main
+      # deb http://deb.debian.org/debian trixie-updates main
+      # deb http://deb.debian.org/debian-security trixie-security main
+    disable_suites: [updates, backports, security]
   
   storage:
     layout:
@@ -36,14 +52,10 @@ autoinstall:
     allow-pw: true
     authorized-keys: []
   
+  # Only install packages available on the ISO
   packages:
     - openssh-server
-    - curl
-    - wget
-    - gnupg2
-    - ca-certificates
     - sudo
-    - vim
     - open-vm-tools
   
   user-data:
@@ -55,3 +67,5 @@ autoinstall:
     - systemctl enable ssh
     - sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /target/etc/ssh/sshd_config
     - sed -i 's/^#PubkeyAuthentication.*/PubkeyAuthentication yes/' /target/etc/ssh/sshd_config
+    - echo 'APT::Get::Assume-Yes "true";' > /target/etc/apt/apt.conf.d/90packer
+    - echo 'APT::Get::Force-Yes "true";' >> /target/etc/apt/apt.conf.d/90packer
